@@ -1,0 +1,98 @@
+urls:
+  # ————————————————— Tarifs / documents officiels —————————————————
+  - https://www.labanquepostale.fr/particulier/footer/tarifs.html
+  - https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf
+
+  # ———————————————— Contacts / urgences / réclamations ————————————————
+  - https://www.labanquepostale.fr/particulier/footer/contacts.html
+  - https://www.labanquepostale.fr/particulier/footer/centre-aide/urgences-paiement.html
+  - https://www.labanquepostale.fr/particulier/footer/reclamation.html
+  - https://www.labanquepostale.fr/particulier/footer/centres-financiers.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/a-propos-de-la-banque-postale/contacts.question.html/quels-sont-les-horaires-du-3639.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/a-propos-de-la-banque-postale/contacts.question.html/comment-contacter-un-conseiller.html
+
+  # ———————————————— Sécurité / authentification ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/securite/certicode-plus.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.question.html/comment-activer-certicode-plus.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.question.html/comment-changer-mon-appareil-de-confiance.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/securite/certicode-numero-securise.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode.question.html/quel-est-le-delai-d-ajout-d-un-beneficiaire-avec-certicode.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/3d-secure.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/3d-secure.question.html/quelles-sont-les-methodes-de-validation-proposees-par-la-banque-postale-pour-valider-vos-paiements-en-ligne-3ds.html
+  - https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes.html
+  - https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/email-sms.html
+  - https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/internet-reseaux-sociaux.html
+  - https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/telephones-autres.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/a-propos-de-la-banque-postale/fraude.question.html/que-faire-si-j-ai-repondu-a-un-e-mail-frauduleux.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/a-propos-de-la-banque-postale/fraude.question.html/comment-reconnaitre-un-mail-frauduleux.html
+
+  # ———————————————— Virements / prélèvements / RIB-IBAN ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/virement-sepa.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/virement.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/virement.question.html/qu-est-ce-qu-un-virement-instantane.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/virement.question.html/comment-realiser-un-virement-instantane.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/virement.question.html/comment-beneficier-du-service-de-virement-instantane.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/virement-international.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/prelevement.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/prelevement.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/prelevement.question.html/comment-suspendre-temporairement-un-ou-plusieurs-prelevement-s-grace-a-l-opposition.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement.question.html/comment-faire-une-reclamation-liee-a-un-prelevement.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client/rib-et-iban.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client.question.html/comment-editer-un-rib.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client/rib-et-iban.question.html/qu-est-ce-que-mon-numero-d-iban.html
+
+  # ———————————————— Cartes / plafonds / e-Carte Bleue / 3-D Secure ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-classic.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-premier.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-realys.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/service-e-carte-bleue.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes.question.html/comment-acceder-au-service-e-carte-bleue.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/cartes-bancaires/e-carte-bleue.question.html/qu-est-ce-que-la-e-carte-bleue.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/application-mobile/reglages-de-la-carte.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/cartes-bancaires.question.html/comment-augmenter-le-plafond-de-ma-carte-bancaire.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/cartes-bancaires.question.html/comment-gerer-le-plafond-de-ma-carte.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/comptes-bancaires.question.html/comment-fonctionnent-les-plafonds-de-paiement-et-de-retrait-de-ma-carte-bancaire-en-jours-glissants.html
+
+  # ———————————————— Paiement mobile / Wero ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/samsung-pay.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/samsung-pay.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/samsung-pay.question.html/quelles-sont-les-conditions-pour-beneficier-de-samsung-pay.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/samsung-pay.question.html/est-il-possible-d-utiliser-samsung-pay-a-l-etranger.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/wero.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/wero.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/wero.question.html/qu-est-ce-que-wero.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/wero.question.html/comment-activer-wero.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/wero.question.html/comment-securiser-mon-portefeuille-de-paiement-wero.html
+
+  # ———————————————— Chèques / opposition / incidents ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/cheques.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/cheques.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/urgences.question.html/dans-quel-cas-puis-je-faire-opposition-sur-un-cheque.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/urgences.question.html/comment-contester-un-paiement-par-cheque.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/cheques.question.html/comment-proceder-a-la-regularisation-d-un-cheque-sans-provision.html
+
+  # ———————————————— Espace client / appli mobile ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/banque-en-ligne.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/application-mobile.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client/connexion.question.html/comment-me-connecter-a-mon-espace-client.html
+  - https://www.labanquepostale.fr/particulier/footer/aide-connexion.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/la-banque-postale-chez-soi.html
+
+  # ———————————————— Compte courant / ouverture / découvert ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/ouvrir-un-compte.html
+  - https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/comptes-bancaires.question.html/quelles-sont-les-conventions-de-compte-courant-de-la-banque-postale.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/comptes-bancaires/formule-de-compte.html
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/comptes-bancaires/decouvert-autorise.html
+
+  # ———————————————— Western Union / services complémentaires ————————————————
+  - https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/service-western-union.html
+
+  # ———————————————— Références publiques complémentaires ————————————————
+  - https://www.service-public.fr/particuliers/vosdroits/F313
+  - https://www.banque-france.fr/fr/a-votre-service/particuliers/mieux-connaitre-moyens-paiement/le-virement-sepa-instantane
+  - https://www.banque-france.fr/fr/a-votre-service/particuliers/mieux-connaitre-moyens-paiement/virement-sepa
+
+  # (facultatif ; souvent 403 côté EPC — laissez commenté si ça bloque)
+  # - https://www.europeanpaymentscouncil.eu/what-we-do/sepa-instant-credit-transfer
+  # - https://www.europeanpaymentscouncil.eu/what-we-do/epc-payment-schemes/sepa-instant-credit-transfer/sepa-instant-credit-transfer-rulebook

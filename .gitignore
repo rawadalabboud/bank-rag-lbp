@@ -1,0 +1,28 @@
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+.env.local
+*.log
+.cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# RAG build artifacts (reproducible)
+bank-rag-fr-corpus/faiss_index/
+bank-rag-fr-corpus/chroma/
+
+# Downloads / tmp
+tmp/

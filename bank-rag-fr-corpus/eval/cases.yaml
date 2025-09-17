@@ -1,0 +1,8 @@
+- q: "Frais d'un virement SEPA au guichet ?"
+  must_contain: ["5,50 €", "Tarifs Particuliers 2025"]
+- q: "Frais d'un virement SEPA en ligne ?"
+  must_contain: ["Gratuit", "Tarifs Particuliers 2025"]
+- q: "Frais d'un virement instantané ?"
+  must_contain: ["Gratuit"]
+- q: "Frais de retrait DAB autre banque en France ?"
+  must_contain: ["1,00 €", "Tarifs Particuliers 2025"]
