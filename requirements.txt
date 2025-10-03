@@ -27,6 +27,10 @@ pymupdf>=1.22.0
 sentence-transformers>=2.5.1
 torch>=2.2.0
 huggingface-hub>=0.18.1
+fastapi>=0.100.0
+uvicorn>=0.23.2
+datasets>=2.13.1
+einops>=0.6.11
 
 # Vector stores
 chromadb>=0.5

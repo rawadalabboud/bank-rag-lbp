@@ -26,3 +26,15 @@ bank-rag-fr-corpus/chroma/
 
 # Downloads / tmp
 tmp/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore env files with secrets (keep .env.prod only if safe)
+.env
+.env.local
+
+# Ignore evaluation outputs
+bank-rag-fr-corpus/scripts/*.csv
+bank-rag-fr-corpus/scripts/*.json

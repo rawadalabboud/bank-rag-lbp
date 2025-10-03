@@ -1,0 +1,729 @@
+# eval_bank_fr.yaml
+# Jeu d’évaluation RAG complet (La Banque Postale + Banque de France + Service Public)
+# Schéma par item:
+# - id: identifiant unique (kebab-case)
+#   question: formulation principale
+#   variants: [2..3 paraphrases naturelles]
+#   expected_sources: liste d’URL (ou fragments) correspondant à tes .md
+#   expected_regex: (optionnel) expressions à retrouver dans la réponse finale
+#   must_contain_any: (optionnel) mots/expressions clés à retrouver
+#   unanswerable: true si la bonne réponse est “hors périmètre / info manquante”
+
+questions:
+
+  # =========================
+  # TARIFS 2025 — (PDF + pages)
+  # =========================
+  - id: tarifs-visa-premier
+    question: "Quels sont les frais de la Carte Visa Premier ?"
+    variants:
+      - "Combien coûte la Visa Premier par mois ?"
+      - "Montant de la cotisation Carte Visa Premier ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-premier.html"
+    expected_regex:
+      # Mention either a price in € or clear tariff words + "Premier"
+      - "(?:(?<!\\S)\\d{1,3}(?:[ .]\\d{3})*(?:[.,]\\d{1,2})?\\s?€)|(?:\\b(cotis|frais|tarif|mensuel|mois)\\b)"
+      - "\\b(premier)\\b"
+    must_contain_any:
+      - "Visa Premier"
+
+  - id: tarifs-visa-classic
+    question: "Quels sont les frais de la Carte Visa Classic ?"
+    variants:
+      - "Prix de la carte Visa Classic ?"
+      - "Cotisation Visa Classic, c’est combien ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-classic.html"
+    expected_regex:
+      - "(?:(?<!\\S)\\d{1,3}(?:[ .]\\d{3})*(?:[.,]\\d{1,2})?\\s?€)|(?:\\b(cotis|frais|tarif|mensuel|mois)\\b)"
+      - "\\b(classic)\\b"
+
+  - id: plafonds-visa-premier
+    question: "Quels sont les plafonds de paiement et de retrait d'une Carte Visa Premier ?"
+    variants:
+      - "Plafond Visa Premier (paiement/retrait) ?"
+      - "Limites de dépenses et retraits avec Visa Premier ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-premier.html"
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      # Accepts 'plafond(s)', 'limite(s)', and mentions paiement/retrait
+      - "\\b(plafond|limite)s?\\b"
+      - "\\b(paiement|payer|retrait|retirer)\\b"
+
+  - id: frais-retrait-zone-euro
+    question: "Les retraits en zone euro sont-ils facturés ?"
+    variants:
+      - "Retirer de l’argent en zone euro : y a-t-il des frais ?"
+      - "Frais DAB dans la zone euro ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(retrait|retirer|dab|distributeur)\\b"
+      - "\\b(zone\\s*euro)\\b"
+      - "\\b(frais|commission|gratuite?)\\b"
+
+  - id: frais-retrait-hors-zone-euro
+    question: "Quels sont les frais pour un retrait hors zone euro ?"
+    variants:
+      - "Retrait à l’étranger hors euro : quels frais ?"
+      - "DAB hors zone euro : commissions ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(retrait|retirer|dab|distributeur)\\b"
+      - "\\b(hors\\s*zone\\s*euro|étranger|hors\\s*euro)\\b"
+      - "\\b(frais|commission)\\b"
+
+  - id: frais-paiement-hors-zone-euro
+    question: "Quels sont les frais pour un paiement hors zone euro ?"
+    variants:
+      - "Payer par carte hors zone euro : commission ?"
+      - "Achats à l’étranger (hors euro) : frais ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(paiement|payer|achat)\\b"
+      - "\\b(hors\\s*zone\\s*euro|étranger|hors\\s*euro)\\b"
+      - "\\b(frais|commission)\\b"
+
+  - id: virement-sepa-occasionnel
+    question: "Un virement SEPA occasionnel est-il payant ?"
+    variants:
+      - "Frais d’un virement SEPA ponctuel ?"
+      - "Coût d’un virement SEPA unique ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(virement)\\b"
+      - "\\b(sepa)\\b"
+      - "\\b(occasionnel|ponctuel|unique)\\b"
+      - "\\b(frais|gratuit|tarif)\\b"
+
+  - id: virement-sepa-permanent
+    question: "Le virement SEPA permanent a-t-il des frais ?"
+    variants:
+      - "Coût d’un virement SEPA récurrent ?"
+      - "Virement SEPA permanent : payant ou gratuit ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(virement)\\b"
+      - "\\b(sepa)\\b"
+      - "\\b(permanent|récurrent)\\b"
+      - "\\b(frais|gratuit|tarif)\\b"
+
+  - id: frais-tenue-compte
+    question: "Quels sont les frais de tenue de compte ?"
+    variants:
+      - "Tenue de compte : combien ça coûte ?"
+      - "Frais de gestion du compte courant ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/comptes-bancaires/formule-de-compte.html"
+    expected_regex:
+      - "\\b(tenue\\s*de\\s*compte|frais\\s*de\\s*tenue|gestion\\s*du\\s*compte)\\b"
+      - "(?:(?<!\\S)\\d{1,3}(?:[ .]\\d{3})*(?:[.,]\\d{1,2})?\\s?€)|\\b(frais|tarif|cotis)\\b"
+
+  - id: opposition-carte-frais
+    question: "Combien coûte l'opposition sur carte bancaire ?"
+    variants:
+      - "Opposition carte : tarif ?"
+      - "Faire opposition : y a-t-il des frais ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+      - "https://www.labanquepostale.fr/particulier/footer/centre-aide/urgences-paiement.html"
+    expected_regex:
+      - "\\b(opposition)\\b"
+      - "\\b(carte)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: renouvellement-carte-anticipe
+    question: "Le renouvellement anticipé d'une carte est-il facturé ?"
+    variants:
+      - "Changer sa carte avant l’échéance : prix ?"
+      - "Renouvellement anticipé : frais applicables ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(renouvellement|remplacement)\\b"
+      - "\\b(anticipé|avant\\s*l[’']?échéance)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: incident-paiement-commission
+    question: "Quelles commissions en cas d'incident de paiement ?"
+    variants:
+      - "Incidents de paiement : quels frais ?"
+      - "Rejet/pré­sentation : commissions ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(incident[s]?\\s*de\\s*paiement|rejet|présentation)\\b"
+      - "\\b(frais|commission[s]?)\\b"
+
+  - id: decouvert-autorise-frais
+    question: "Le découvert autorisé entraîne-t-il des frais ?"
+    variants:
+      - "Découvert autorisé : agios, taux ?"
+      - "Utiliser le découvert : quel coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(découvert)\\b"
+      - "\\b(autorisé)\\b"
+      - "\\b(agios|taux|frais|coût)\\b"
+
+  - id: chequier-frais
+    question: "La délivrance d'un chéquier est-elle facturée ?"
+    variants:
+      - "Obtenir un chéquier : payant ?"
+      - "Chéquier : frais de mise à disposition ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(chéquier|chequier|carnet\\s*de\\s*chèques)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: commission-intervention
+    question: "À combien s'élève la commission d'intervention ?"
+    variants:
+      - "Commission d’intervention : montant ?"
+      - "Frais d’intervention : combien ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "commission d'intervention"
+    expected_regex:
+      # allow singular/plural, hyphen/no hyphen, accent/no accent
+      - "\\b(commission[s]?\\s*d[’']?intervention)\\b|\\b(commission[s]?\\s*d\\s*intervention)\\b"
+
+
+  - id: assurance-moyens-paiement-prix
+    question: "Existe-t-il une assurance des moyens de paiement et son prix ?"
+    variants:
+      - "Assurance moyens de paiement : cotisation ?"
+      - "Protection des moyens de paiement : tarif ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+      - "https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes.html"
+    expected_regex:
+      - "\\b(assurance|protection)\\b"
+      - "\\b(moyen[s]?\\s*de\\s*paiement|carte|chèques?)\\b"
+      - "\\b(cotis|frais|tarif|prix|coût)\\b"
+
+  - id: virement-instantane-payant
+    question: "Le virement SEPA instantané est-il payant ?"
+    variants:
+      - "Virement immédiat : frais ?"
+      - "SEPA instantané : coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(virement)\\b"
+      - "\\b(sepa|instantan[ée]?)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: carte-supplementaire
+    question: "Y a-t-il un tarif pour une carte supplémentaire sur le même compte ?"
+    variants:
+      - "Deuxième carte sur compte : prix ?"
+      - "Carte additionnelle : cotisation ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(carte)\\b"
+      - "\\b(supplémentaire|additionnelle|deuxi[eè]me)\\b"
+      - "\\b(cotis|frais|tarif|coût|gratuit)\\b"
+
+  - id: depot-especes-guichet
+    question: "Le dépôt d'espèces au guichet est-il facturé ?"
+    variants:
+      - "Déposer du cash au guichet : frais ?"
+      - "Versement espèces en agence : coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(d[ée]p[oô]t|versement)\\b"
+      - "\\b(esp[eè]ces|cash)\\b"
+      - "\\b(guichet|agence)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: depot-especes-dab
+    question: "Le dépôt d'espèces au DAB est-il facturé ?"
+    variants:
+      - "Dépôt d’espèces au distributeur : frais ?"
+      - "Versement cash au DAB : coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(d[ée]p[oô]t|versement)\\b"
+      - "\\b(esp[eè]ces|cash)\\b"
+      - "\\b(dab|distributeur)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: depot-cheque-frais
+    question: "Le dépôt d'un chèque est-il payant ?"
+    variants:
+      - "Remise de chèque : frais ?"
+      - "Déposer un chèque : coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(d[ée]p[oô]t|remise)\\b"
+      - "\\b(ch[eè]que)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  - id: envoi-carte-domicile
+    question: "L'envoi d'une carte à domicile est-il facturé ?"
+    variants:
+      - "Recevoir la carte chez soi : frais ?"
+      - "Expédition carte bancaire : coût ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(envoi|exp[ée]dition|livraison)\\b"
+      - "\\b(carte)\\b"
+      - "\\b(domicile|chez\\s*soi|adresse)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+
+  - id: remplacement-carte-defectueuse
+    question: "Le remplacement d'une carte défectueuse est-il payant ?"
+    variants:
+      - "Changer une carte défaillante : prix ?"
+      - "Remplacement carte HS : frais ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/content/dam/lbp/documents/tarifs/tarifs-particuliers-2025-la-banque-postale.pdf"
+    expected_regex:
+      - "\\b(remplacement|changement)\\b"
+      - "\\b(carte)\\b"
+      - "\\b(d[ée]fectueuse|d[ée]faillante|hs)\\b"
+      - "\\b(frais|tarif|coût|gratuit)\\b"
+
+  # =========================
+  # CARTES BANCAIRES — PRODUITS
+  # =========================
+  - id: carte-visa-classic-produit
+    question: "Quelles sont les caractéristiques principales de la carte Visa Classic ?"
+    variants:
+      - "Avantages de la Visa Classic ?"
+      - "Que propose la carte Visa Classic ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-classic.html"
+
+  - id: carte-visa-premier-produit
+    question: "Quels sont les avantages et assurances de la carte Visa Premier ?"
+    variants:
+      - "Visa Premier : assurances/assistances ?"
+      - "Visa Premier : avantages clés ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-visa-premier.html"
+
+  - id: carte-realys-produit
+    question: "Que propose la carte Réalys et pour quel profil ?"
+    variants:
+      - "Carte Réalys : caractéristiques principales"
+      - "Réalys : à autorisation systématique ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/cartes-bancaires/carte-realys.html"
+
+  # =========================
+  # COMPTES / OFFRES
+  # =========================
+  - id: formule-de-compte
+    question: "Qu’est-ce que la Formule de Compte et que contient-elle ?"
+    variants:
+      - "Formule de Compte : services inclus ?"
+      - "Avantages de la Formule de Compte ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/comptes-bancaires/formule-de-compte.html"
+
+  - id: decouvert-autorise-fonctionnement
+    question: "Comment fonctionne le découvert autorisé à La Banque Postale ?"
+    variants:
+      - "Découvert : mise en place, plafond, coût ?"
+      - "Différence découvert autorisé vs incident ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/comptes-bancaires/decouvert-autorise.html"
+
+  - id: ouvrir-un-compte
+    question: "Comment ouvrir un compte à La Banque Postale ?"
+    variants:
+      - "Ouvrir un compte en ligne ou en bureau ?"
+      - "Pièces nécessaires pour ouverture de compte ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/ouvrir-un-compte.html"
+
+  # =========================
+  # ESPACE CLIENT / APPLI
+  # =========================
+  - id: appli-mobile-fonctions
+    question: "Quelles sont les fonctions clés de l’application mobile LBP ?"
+    variants:
+      - "Application LBP : consulter comptes, virements, sécurité ?"
+      - "Appli LBP : gestion des cartes et notifications ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/application-mobile.html"
+
+  - id: applis-reglages-carte
+    question: "Comment gérer les réglages de ma carte dans l’appli ?"
+    variants:
+      - "Activer/désactiver sans contact, internet, étranger ?"
+      - "Modifier plafonds depuis l’application ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/application-mobile/reglages-de-la-carte.html"
+
+  - id: banque-en-ligne-connexion
+    question: "Comment se connecter à mon espace client en ligne ?"
+    variants:
+      - "Accès banque en ligne : où cliquer ?"
+      - "Aide connexion espace client ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/banque-en-ligne.html"
+      - "https://www.labanquepostale.fr/particulier/footer/aide-connexion.html"
+
+  - id: banque-postale-chez-soi
+    question: "Puis-je tout gérer à distance depuis chez moi ?"
+    variants:
+      - "La Banque Postale chez soi : c’est quoi ?"
+      - "Accéder à ses comptes sans se déplacer ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/espaces-clients/la-banque-postale-chez-soi.html"
+
+  # =========================
+  # RIB / IBAN
+  # =========================
+  - id: iban-definition
+    question: "Qu’est-ce que l’IBAN et où le trouver ?"
+    variants:
+      - "IBAN : longueur en France et à quoi il sert ?"
+      - "Où trouver mon IBAN/RIB dans l’espace client ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client/rib-et-iban.question.html/qu-est-ce-que-mon-numero-d-iban.html"
+
+  - id: rib-editer
+    question: "Comment éditer un RIB depuis l’Espace Client ?"
+    variants:
+      - "Télécharger un RIB (PDF) : étapes ?"
+      - "Obtenir un RIB dans l’appli LBP ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/espace-client.question.html/comment-editer-un-rib.html"
+
+  # =========================
+  # SÉCURITÉ / AUTH
+  # =========================
+  - id: certicode-plus-definition
+    question: "Qu’est-ce que Certicode Plus et à quoi ça sert ?"
+    variants:
+      - "Pourquoi activer Certicode Plus ?"
+      - "Différence Certicode vs Certicode Plus ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.html"
+
+  - id: certicode-plus-activation
+    question: "Comment activer Certicode Plus ?"
+    variants:
+      - "Activation Certicode+ : procédure détaillée"
+      - "Activer Certicode Plus sur smartphone ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.question.html/comment-activer-certicode-plus.html"
+
+  - id: certicode-plus-changer-appareil
+    question: "Comment changer d’appareil pour Certicode Plus ?"
+    variants:
+      - "Nouveau téléphone pour Certicode+ : comment faire ?"
+      - "Transférer Certicode Plus sur un autre mobile ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/certicode-plus.question.html/comment-changer-d-appareil.html"
+
+  - id: 3d-secure-fonctionnement
+    question: "À quoi sert le 3-D Secure et comment ça marche ?"
+    variants:
+      - "Paiement en ligne sécurisé (3-D Secure) ?"
+      - "Mesures de sécurité 3-D Secure chez LBP ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/3d-secure.html"
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/securite/3d-secure.question.html/quelles-sont-les-mesures-de-securite-pour-mes-paiements-sur-internet.html"
+    expected_regex:
+      - "\\b(3[- ]?d\\s*secure)\\b"
+      - "\\b(paiement[s]?\\s*en\\s*ligne|s[ée]curit[ée])\\b"
+
+  - id: e-carte-bleue
+    question: "Qu’est-ce que le service e-Carte Bleue et comment l’activer ?"
+    variants:
+      - "Numéro virtuel pour payer en ligne (e-CB) ?"
+      - "Accéder à e-Carte Bleue : étapes ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/service-e-carte-bleue.html"
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes.question.html/comment-acceder-au-service-e-carte-bleue.html"
+    expected_regex:
+      - "\\b(e[- ]?carte\\s*bleue|num[ée]ro\\s*virtuel)\\b"
+      - "\\b(activer|activation|acc[ée]der)\\b"
+
+  - id: samsung-pay
+    question: "Samsung Pay à La Banque Postale : conditions et usage"
+    variants:
+      - "Comment payer avec Samsung Pay ?"
+      - "Compatibilité et sécurité Samsung Pay ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/services-de-cartes/samsung-pay.html"
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/samsung-pay.html"
+
+  # =========================
+  # VIREMENTS / PRÉLÈVEMENTS / CHÈQUES / WU / Wero
+  # =========================
+  - id: virement-sepa-definition
+    question: "Qu’est-ce qu’un virement SEPA et comment ça fonctionne ?"
+    variants:
+      - "Zones, délais et infos nécessaires pour un SEPA ?"
+      - "Différence SEPA vs international ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/virement-sepa.html"
+    expected_regex:
+      - "\\b(virement)\\b"
+      - "\\b(sepa)\\b"
+      - "\\b(zone|d[ée]lais|iban|bic|fonctionne)\\b"
+
+  - id: virement-sepa-instantane-bdf
+    question: "Le virement SEPA instantané : principe et disponibilité"
+    variants:
+      - "En combien de secondes un SEPA instantané arrive ?"
+      - "Disponibilité 24/7/365 du SEPA instantané ?"
+    expected_sources:
+      - "https://www.banque-france.fr/fr/a-votre-service/particuliers/mieux-connaitre-moyens-paiement/le-virement-sepa-instantane"
+    expected_regex:
+      - "\\b(sepa)\\b"
+      - "\\b(instantan[ée]?|imm[ée]diat)\\b"
+      - "\\b(24\\/?7|365|secondes?)\\b"
+
+  - id: virement-international
+    question: "Comment effectuer un virement international avec LBP ?"
+    variants:
+      - "Virement hors SEPA : infos et délais"
+      - "IBAN/BIC requis pour virement international ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/virement-international.html"
+    expected_regex:
+      - "\\b(virement)\\b"
+      - "\\b(international|hors\\s*sepa)\\b"
+      - "\\b(iban|bic|swift|d[ée]lais)\\b"
+
+  - id: prelevement-auto
+    question: "Comment fonctionne le prélèvement automatique ?"
+    variants:
+      - "Mettre en place/arrêter un prélèvement ?"
+      - "Droits en cas de litige sur un prélèvement ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/prelevement.html"
+    expected_regex:
+      - "\\b(pr[ée]l[eè]vement[s]?)\\b"
+      - "\\b(automatique|sepa)\\b"
+      - "\\b(mettre\\s*en\\s*place|arr[êe]ter|mandat|litige)\\b"
+
+  - id: cheques-securite
+    question: "Quelles règles de sécurité pour les chèques ?"
+    variants:
+      - "Remplir un chèque sans risque (astuces) ?"
+      - "Délai de reprise de fonds après encaissement ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/cheques.html"
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/cheques.question.html/comment-prevenir-les-risques-lies-a-l-utilisation-du-cheque.html"
+    expected_regex:
+      - "\\b(ch[eè]que[s]?)\\b"
+      - "\\b(s[ée]curit[ée]|remplir|d[ée]lai[s]?)\\b"
+
+  - id: western-union
+    question: "Qu’est-ce que le service Western Union à LBP ?"
+    variants:
+      - "Envoyer/recevoir de l’argent avec Western Union ?"
+      - "Conditions et limites Western Union ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/service-western-union.html"
+
+  - id: wero
+    question: "C’est quoi Wero et comment l’activer ?"
+    variants:
+      - "Wero entre particuliers : comment ça marche ?"
+      - "Wero : sécurité et limites ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/comptes-et-cartes/moyens-de-paiement/wero.html"
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/moyens-de-paiement/wero.question.html/comment-activer-wero.html"
+    expected_regex:
+      - "\\b(wero)\\b"
+      - "\\b(activer|s[ée]curit[ée]|limite[s]?)\\b"
+
+  # =========================
+  # URGENCES / FRAUDES / CONTACTS / RÉCLAMATIONS
+  # =========================
+  - id: carte-avalee-dab
+    question: "Ma carte a été avalée par un DAB : que faire ?"
+    variants:
+      - "Carte retenue au distributeur : que faire ?"
+      - "Carte avalée : procédure ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/centre-aide/urgences-paiement.html"
+    expected_regex:
+      - "\\b(carte)\\b"
+      - "\\b(aval[ée]e|retenue)\\b"
+      - "\\b(dab|distributeur)\\b"
+      - "\\b(proc[ée]dure|que\\s*faire|opposition)\\b"
+
+  - id: carte-bloquee
+    question: "Que faire si ma carte est bloquée ?"
+    variants:
+      - "Carte bloquée : comment la débloquer ?"
+      - "Ma carte ne fonctionne plus : étapes ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/centre-aide/urgences-paiement.html"
+    expected_regex:
+      - "\\b(carte)\\b"
+      - "\\b(bloqu[ée]e|d[ée]bloquer)\\b"
+      - "\\b(proc[ée]dure|que\\s*faire|opposition)\\b"
+
+  - id: contestation-paiement
+    question: "Comment contester un paiement que je ne reconnais pas ?"
+    variants:
+      - "Opération carte inconnue : contestation ?"
+      - "Transaction frauduleuse : quels recours ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/faq-centre-aide/comptes-et-cartes/urgences.question.html/dans-quel-cas-puis-je-faire-une-contestation.html"
+    expected_regex:
+      - "\\b(contestation|contester|litige|op[ée]ration\\s*non\\s*reconnue)\\b"
+      - "\\b(carte|paiement)\\b"
+
+  - id: fraude-email-sms
+    question: "Comment reconnaître un email ou SMS frauduleux ?"
+    variants:
+      - "Détecter un phishing par email/SMS : comment ?"
+      - "Signes d’un message frauduleux ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/email-sms.html"
+    expected_regex:
+      - "\\b(fraude|phishing|hame[çc]onnage)\\b"
+      - "\\b(email|courriel|sms|message)\\b"
+      - "\\b(reconn[aîi]tre|signes|indices)\\b"
+
+  - id: fraude-reseaux-sociaux
+    question: "Quels conseils de sécurité pour les réseaux sociaux ?"
+    variants:
+      - "Sécurité sur les réseaux sociaux : bonnes pratiques ?"
+      - "Réseaux sociaux : éviter les fraudes ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/internet-reseaux-sociaux.html"
+    expected_regex:
+      - "\\b(fraude|arnaque|s[ée]curit[ée])\\b"
+      - "\\b(r[ée]seaux?\\s*sociaux?)\\b"
+      - "\\b(conseils|bonnes\\s*pratiques|pr[ée]cautions)\\b"
+
+  - id: fraude-telephone
+    question: "Comment réagir à une fraude par téléphone ?"
+    variants:
+      - "Appels frauduleux se faisant passer pour la banque : que faire ?"
+      - "Arnaque par téléphone : réaction ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes/telephones-autres.html"
+    expected_regex:
+      - "\\b(fraude|arnaque|appel[s]?)\\b"
+      - "\\b(t[ée]l[ée]phone)\\b"
+      - "\\b(r[ée]agir|que\\s*faire|conseils)\\b"
+
+  - id: contacts
+    question: "Comment contacter La Banque Postale ?"
+    variants:
+      - "Quels sont les moyens de contact LBP ?"
+      - "Numéros et canaux de contact La Banque Postale ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/contacts.html"
+    expected_regex:
+      - "\\b(contact|joindre|num[ée]ro|canaux)\\b"
+      - "\\b(la\\s*banque\\s*postale|lbp)\\b"
+
+  - id: centres-financiers
+    question: "Où trouver les coordonnées des centres financiers LBP ?"
+    variants:
+      - "Adresse/numéro des centres financiers ?"
+      - "SAV par centre financier : où voir ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/centres-financiers.html"
+    expected_regex:
+      - "\\b(centre[s]?\\s*financier[s]?)\\b"
+      - "\\b(coordonn[ée]es|adresse|num[ée]ro)\\b"
+
+  - id: reclamation
+    question: "Comment déposer une réclamation auprès de La Banque Postale ?"
+    variants:
+      - "Procédure de réclamation LBP ?"
+      - "Portail réclamations : où aller ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/reclamation.html"
+    expected_regex:
+      - "\\b(r[ée]clamation[s]?)\\b"
+      - "\\b(proc[ée]dure|d[ée]poser|portail)\\b"
+
+  - id: page-alertes-fraudes
+    question: "Où trouver le récapitulatif des bonnes pratiques sécurité LBP ?"
+    variants:
+      - "Page Alertes & Fraudes (vue d’ensemble) ?"
+      - "Conseils sécurité quotidiens LBP ?"
+    expected_sources:
+      - "https://www.labanquepostale.fr/particulier/footer/alertes-et-fraudes.html"
+    expected_regex:
+      - "\\b(alertes?\\s*&?\\s*fraudes?)\\b"
+      - "\\b(conseils|bonnes\\s*pratiques|s[ée]curit[ée])\\b"
+
+  # =========================
+  # SERVICE PUBLIC / BDF (références neutres)
+  # =========================
+  - id: sp-frais-virement
+    question: "Quels sont les frais d’un virement selon Service-Public.fr ?"
+    variants:
+      - "Virements : coût et conditions (Service-Public) ?"
+      - "Frais de virement bancaire (référence Service-Public) ?"
+    expected_sources:
+      - "https://www.service-public.fr/particuliers/vosdroits/F313"
+    expected_regex:
+      - "\\b(service[- ]public)\\b"
+      - "\\b(virement[s]?)\\b"
+      - "\\b(frais|coût|tarif)\\b"
+
+  - id: bdf-sepa-instantane
+    question: "Banque de France : qu’est-ce que le virement SEPA instantané ?"
+    variants:
+      - "SEPA instant : disponibilité 24/7/365 (BDF) ?"
+      - "Délais en secondes (BDF) ?"
+    expected_sources:
+      - "https://www.banque-france.fr/fr/a-votre-service/particuliers/mieux-connaitre-moyens-paiement/le-virement-sepa-instantane"
+    expected_regex:
+      - "\\b(banque\\s*de\\s*france)\\b"
+      - "\\b(sepa)\\b"
+      - "\\b(instantan[ée]?|imm[ée]diat|24\\/?7|365|secondes?)\\b"
+      
+  # =========================
+  # HORS PÉRIMÈTRE (doivent retourner « Information manquante… »)
+  # =========================
+  - id: out-bnp-taux-immo
+    question: "Quel est le taux de crédit immobilier à la BNP Paribas aujourd'hui ?"
+    variants:
+      - "Taux immo actuel chez BNP ?"
+      - "BNP : taux prêt logement du moment ?"
+    expected_sources: []
+    unanswerable: true
+
+  - id: out-cloture-compte-autre-banque
+    question: "Comment clôturer un compte chez une autre banque ?"
+    variants:
+      - "Clôture de compte dans une autre banque : procédure ?"
+      - "Fermer un compte ailleurs : comment faire ?"
+    expected_sources: []
+    unanswerable: true
+
+  - id: out-crypto-mining-carte
+    question: "Puis-je miner des cryptomonnaies avec ma carte Visa Premier ?"
+    variants:
+      - "Mining crypto avec carte bancaire : possible ?"
+      - "Utiliser Visa Premier pour miner : faisable ?"
+    expected_sources: []
+    unanswerable: true
