@@ -1,11 +1,11 @@
-# Assistant LBP (RAG) — Chatbot bancaire FR
+# Assistant LBP (RAG) — Chatbot bancaire FR 🇫🇷💳
 
-_Retrieval-Augmented Generation (RAG) pour répondre en français aux questions clients à partir des pages officielles **La Banque Postale** (FAQ, Tarifs PDF, etc.)._
+_Un assistant bancaire basé sur **Retrieval-Augmented Generation (RAG)** pour répondre en français aux questions clients à partir des pages officielles de **La Banque Postale**, **Service-Public.fr**, et **Banque de France**._
 
-> ✅ Réponses sourcées (titre + URL)  
-> ✅ Mode sans LLM (extraction factuelle) **ou** avec LLM (Hugging Face / OpenAI / Ollama)  
-> ✅ Évaluation rapide sur des cas métiers (tarifs, virements, RIB/IBAN…)  
-> ✅ Petite app web (FastAPI + HTML/CSS) avec joli UI et logo LBP
+> ✅ Réponses **sourcées** (titre + URL officiel)  
+> ✅ Mode **extraction factuelle** (sans LLM) ou **génératif** (Hugging Face / OpenAI / Ollama)  
+> ✅ Évaluations automatiques (retrieval & génération) sur un **jeu YAML de 63 cas métier**  
+> ✅ Petite app web (FastAPI + HTML/CSS) avec logo **La Banque Postale**
 
 ---
 
@@ -15,11 +15,11 @@ _Retrieval-Augmented Generation (RAG) pour répondre en français aux questions 
 - [Architecture](#architecture)
 - [Arborescence](#arborescence)
 - [Installation](#installation)
-- [Données & Ingestion](#données--ingestion)
+- [Ingestion des données](#ingestion-des-données)
 - [Recherche & Réponse](#recherche--réponse)
 - [Application Web](#application-web)
 - [Évaluation](#évaluation)
-- [Configuration (env)](#configuration-env)
+- [Configuration](#configuration)
 - [Ajouter des sources](#ajouter-des-sources)
 - [Dépannage](#dépannage)
 - [Licence & mentions](#licence--mentions)
@@ -28,35 +28,31 @@ _Retrieval-Augmented Generation (RAG) pour répondre en français aux questions 
 
 ## Aperçu
 
-Le projet construit un corpus **Markdown** à partir des pages officielles (LBP, Service-Public, Banque de France…).  
-On découpe en *chunks*, on crée des **embeddings** puis on indexe en **FAISS** (par défaut) pour la similarité.  
-Lors d’une question :
+Le pipeline repose sur trois étapes principales :
 
-1. **Récupération** des passages pertinents.  
-2. **Compression** du contexte (sentences scoring) pour limiter les tokens.  
-3. **Génération** avec un LLM (ou **fallback extractif** sans LLM).  
-4. **Citations** systématiques (titre + URL).
+1. **Récupération** des passages pertinents via embeddings + FAISS.  
+2. **Compression** du contexte (scoring par phrase) pour rester efficace et éviter le bruit.  
+3. **Génération contrôlée** :  
+   - Mode **LLM** (HF, OpenAI, Ollama)  
+   - Mode **fallback extractif** (sans LLM, renvoie directement les phrases pertinentes)  
+
+Chaque réponse cite toujours les **sources officielles**.
 
 ---
 
 ## Architecture
 
 ```
-[Sources YAML] -> fetch_to_md.py -> [Markdown] -> ingest.py
-                           |                         |
-                           v                         v
-                         Nettoyage              Split (1000/150)
-                                                Embeddings (HF/OpenAI)
-                                                Vector Store (FAISS/Chroma)
-
-query.py:
-Question -> Retrieve -> Rerank -> Context Compress -> (LLM or Extractif) -> Réponse + Sources
+[Sources YAML/Markdown] -> ingest.py -> [FAISS index]
+                                      |
+query.py: Question -> Retrieve -> Boost (optionnel) -> Context Compress
+         -> (LLM ou Extractif) -> Réponse + Sources
 ```
 
-> Par défaut :  
-> - **Embeddings** : `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (multilingue, gratuit)  
-> - **Vector store** : **FAISS**  
-> - **LLM** : Hugging Face Inference (`Qwen/Qwen2.5-7B-Instruct` conseillé) ou **mode sans LLM**
+- **Corpus** : pages HTML/PDF converties en Markdown avec front-matter  
+- **Embeddings** : Hugging Face (`BAAI/bge-m3`) par défaut  
+- **Vector store** : FAISS  
+- **LLM** : Hugging Face Inference (Meta Llama 3.1 / Qwen2.5) ou OpenAI GPT  
 
 ---
 
@@ -64,20 +60,18 @@ Question -> Retrieve -> Rerank -> Context Compress -> (LLM or Extractif) -> Rép
 
 ```
 bank-rag-fr-corpus/
-├─ app/
-│  ├─ static/              # logo, styles
-│  └─ main.py              # FastAPI + page chat
-├─ data/                   # Markdown générés (corpus)
-├─ eval/
-│  └─ cases.yaml           # Jeux de questions pour tests rapides
-├─ faiss_index/            # Index FAISS (généré)
+├─ app/                     # FastAPI UI
+│  └─ main.py
+├─ data/                    # Markdown (corpus)
+├─ faiss_index/             # Index FAISS (généré)
 ├─ scripts/
-│  ├─ fetch_to_md.py       # Récupération -> Markdown
-│  ├─ ingest.py            # Split + embeddings + FAISS/Chroma
-│  ├─ query.py             # Pipeline RAG (LLM ou extractif)
-│  └─ eval.py              # Petit harness d’évaluation
-├─ sources_fr.yaml         # URLs officielles
-├─ .env.example            # Variables d'environnement (modèle, clés, etc.)
+│  ├─ ingest.py             # Split + embeddings + FAISS
+│  ├─ query.py              # Pipeline RAG
+│  ├─ eval_bank_fr.yaml     # Jeu de 63 cas métier (tarifs, virements, sécurité…)
+│  ├─ eval_retrieval.py     # Éval. retrieval (recall@k, mrr@k)
+│  ├─ eval_rag.py           # Éval. RAG (fact_em, grounded_ok, refusals…)
+│  └─ fetch_to_md.py        # (optionnel) conversion HTML/PDF -> MD
+├─ .env.prod                # Config (sans secrets)
 ├─ requirements.txt
 └─ README.md
 ```
@@ -87,168 +81,132 @@ bank-rag-fr-corpus/
 ## Installation
 
 ```bash
-# 1) Créer l'environnement
 python3 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install -U pip
+pip install -U pip
 pip install -r requirements.txt
+```
 
-# 2) Configurer l'environnement (copier et adapter)
-cp .env.example .env
-# puis exportez vos clés si besoin (OpenAI/HF)
+Configurer l’environnement :
+
+```bash
+cp .env.prod .env   # version de prod, sans secrets
 ```
 
 ---
 
-## Données & Ingestion
+## Ingestion des données
 
-### 1) Récupérer les pages officielles → Markdown
+1. **Préparer le corpus** (`data/*.md`) :  
+   - soit généré via `fetch_to_md.py`  
+   - soit copié depuis le dépôt (LBP, Banque de France, Service-Public)  
 
-```bash
-python3 scripts/fetch_to_md.py
-```
-
-- Lit `sources_fr.yaml`
-- Ajoute un front-matter (langue, URL, titre, date), nettoie l’HTML, sauvegarde `data/*.md`.
-
-### 2) Créer l’index (embeddings + FAISS)
+2. **Créer l’index FAISS** :  
 
 ```bash
-# Option gratuite (HF embeddings) + FAISS
-EMBED_BACKEND=hf VECTORSTORE=faiss python3 scripts/ingest.py
+HF_EMBED_MODEL="BAAI/bge-m3" VECTORSTORE=faiss python3 scripts/ingest.py
 ```
-
-- Split : `chunk_size=1000`, `chunk_overlap=150`
-- Embeddings : `HF_EMBED_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
-- Index : `faiss_index/`
-
-> Vous pouvez basculer vers OpenAI :
->
-> ```bash
-> export OPENAI_API_KEY=sk-...
-> EMBED_BACKEND=openai EMBED_MODEL=text-embedding-3-small python3 scripts/ingest.py
-> ```
 
 ---
 
 ## Recherche & Réponse
 
-### Sans LLM (fallback extractif, rapide et robuste)
+### Mode extraction (sans LLM)
 
 ```bash
-EMBED_BACKEND=hf LLM_BACKEND=none python3 scripts/query.py "Frais d'un virement SEPA au guichet ?"
+LLM_BACKEND=none python3 scripts/query.py "Quels sont les frais d’un virement SEPA ?"
 ```
 
-> Le script sélectionne les phrases les plus proches sémantiquement et renvoie une réponse **strictement factuelle** + **citations**.
+→ renvoie les phrases les plus pertinentes + URL source.
 
-### Avec LLM (Hugging Face)
+### Mode LLM (Hugging Face)
 
 ```bash
-export HUGGING_FACE_HUB_TOKEN=hf_...
-EMBED_BACKEND=hf LLM_BACKEND=hf HF_REPO_ID=Qwen/Qwen2.5-7B-Instruct HF_MAX_NEW_TOKENS=160 HF_TEMPERATURE=0 HF_TIMEOUT=60 TOP_K=3 COMP_CHARS=900 python3 scripts/query.py "Explique la différence entre un virement SEPA et un virement instantané (avec sources)."
+LLM_BACKEND=hf HF_REPO_ID="meta-llama/Meta-Llama-3.1-70B-Instruct" TOP_K=5 COMP_CHARS=1000 python3 scripts/query.py "Comment activer Certicode Plus ?"
 ```
 
-- Le LLM est **chainé** et **contraint** : « Réponds uniquement à partir du contexte. Sinon, dis que l’info manque ».
-- Le contexte est **compressé** (sentence-level scoring) pour rester dans le budget de tokens.
-- Les **citations** sont affichées séparément (titre + URL).
-
-### Avec OpenAI (option)
+### Mode OpenAI
 
 ```bash
-export OPENAI_API_KEY=sk-...
-EMBED_BACKEND=openai LLM_BACKEND=openai CHAT_MODEL=gpt-4o-mini python3 scripts/query.py "Comment activer Certicode Plus ?"
+LLM_BACKEND=openai CHAT_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-... python3 scripts/query.py "Quels sont les plafonds d’une Visa Premier ?"
 ```
-
-### Paramètres utiles
-
-- `TOP_K` : nb de documents récupérés (ex : `3`)
-- `COMP_CHARS` : budget de caractères pour la compression de contexte (ex : `900`)
-- `HF_MAX_NEW_TOKENS`, `HF_TEMPERATURE`, `HF_TIMEOUT` : contrôle des générations
 
 ---
 
 ## Application Web
 
-Lancement de l’API + interface légère :
-
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --reload --port 8000
 ```
 
-- Page d’accueil : champ de question, boutons modèle, citations cliquables, indicateur « l’assistant tape… ».
-- Logo **La Banque Postale** affiché (à placer dans `app/static/logo-lbp.png`).
+- Interface simple type **chat**  
+- Réponses sourcées, citations cliquables  
+- Logo LBP dans `app/static/`
 
 ---
 
 ## Évaluation
 
-Cas minimalistes pour tester la robustesse métier (tarifs, virements, retraits, etc.) :
+### 1. Évaluer le **retrieval seul**
 
 ```bash
-python3 scripts/eval.py
+HF_EMBED_MODEL="BAAI/bge-m3" python3 scripts/eval_retrieval.py
 ```
 
-- Lit `eval/cases.yaml`
-- Exécute `query.py` et vérifie des **assertions textuelles** (ex : présence d’un montant).
-- Compte les réussites/échecs.
+→ calcule `recall@5`, `recall@10`, `mrr@10`
+
+### 2. Évaluer le **RAG complet**
+
+```bash
+LLM_BACKEND=hf HF_REPO_ID="meta-llama/Meta-Llama-3.1-70B-Instruct" TOP_K=5 COMP_CHARS=1100 python3 scripts/eval_rag.py
+```
+
+→ calcule :
+- **Retrieval** : recall/mrr  
+- **Génération** : grounded_ok, citation_precision, refusals  
+- **fact_em** : activable si regex fournis dans YAML (par défaut désactivé en prod)
+
+Résultats sauvegardés dans :
+- `eval_results.csv` (par item)
+- `eval_summary.json` (moyennes)
 
 ---
 
-## Configuration (env)
+## Configuration
 
-Variable | Rôle | Valeur par défaut
----|---|---
-`EMBED_BACKEND` | `hf` \| `openai` | `hf`
-`HF_EMBED_MODEL` | Modèle d’embedding HF | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
-`EMBED_MODEL` | Modèle OpenAI | `text-embedding-3-small`
-`VECTORSTORE` | `faiss` \| `chroma` | `faiss`
-`LLM_BACKEND` | `hf` \| `openai` \| `ollama` \| `none` | `hf`
-`HF_REPO_ID` | Modèle HF Inference | `Qwen/Qwen2.5-7B-Instruct`
-`CHAT_MODEL` | Modèle OpenAI | `gpt-4o-mini`
-`OLLAMA_MODEL` | Modèle local | `mistral`
-`TOP_K` | Docs récupérés | `4`
-`COMP_CHARS` | Budget de contexte (car.) | `1200`
-`HF_MAX_NEW_TOKENS` | Longueur génération | `160`
-`HF_TEMPERATURE` | Température | `0.1`
-`HF_TIMEOUT` | Timeout (s) | `60`
+Variable | Rôle
+---|---
+`HF_EMBED_MODEL` | modèle d’embeddings (par défaut `BAAI/bge-m3`)
+`VECTORSTORE` | FAISS uniquement
+`LLM_BACKEND` | none, hf, openai, ollama
+`HF_REPO_ID` | modèle HF (ex: llama-3.1-70B-instruct)
+`CHAT_MODEL` | modèle OpenAI (ex: gpt-4o-mini)
+`TOP_K` | nb docs à récupérer
+`COMP_CHARS` | budget contexte compressé
+`AMOUNT_BOOST` | `on/off` boost des PDF tarifs
+`FACT_EM_MODE` | `on/off` validation regex factuelles
 
 ---
 
 ## Ajouter des sources
 
-1. Éditer `sources_fr.yaml` (URLs officielles).
-2. `python3 scripts/fetch_to_md.py`
-3. `python3 scripts/ingest.py` (recrée l’index)
-
-> **NB** : pour les PDFs lourds (Tarifs), le découpage Markdown améliore la précision du retrieval.
+1. Ajouter l’URL dans `sources_fr.yaml`  
+2. `python3 scripts/fetch_to_md.py`  
+3. `python3 scripts/ingest.py`  
 
 ---
 
 ## Dépannage
 
-- **429 / rate limit** : réduire `TOP_K`, `HF_MAX_NEW_TOKENS`, `HF_TEMPERATURE`, ou passer en **mode extractif** (`LLM_BACKEND=none`) pour tester.  
-- **Lent sur HF** : privilégier des modèles compacts (`Qwen2.5-7B-Instruct`, `gemma-2-2b-it`), baisser `COMP_CHARS`.  
-- **LibreSSL warning (macOS entreprise)** : sans incidence fonctionnelle.  
-- **Ollama indisponible** : utiliser HF Inference (pas besoin d’installer quoi que ce soit en local).
+- **LibreSSL warning (macOS)** → sans impact  
+- **Réponses trop longues** → baisser `COMP_CHARS` ou `HF_MAX_NEW_TOKENS`  
+- **Pas de LLM dispo** → `LLM_BACKEND=none` pour extraction factuelle  
+- **fact_em trop bas** → ajuster ou désactiver (`FACT_EM_MODE=off`)  
 
 ---
 
 ## Licence & mentions
 
-- Code sous licence **MIT** (adapter si besoin).  
-- Les contenus Markdown proviennent de sites officiels (La Banque Postale, Service-Public, Banque de France). Respecter leurs **conditions d’utilisation**.  
-- Le **logo La Banque Postale** est une marque déposée et n’est utilisé ici qu’à des fins de démonstration.
-
----
-
-### Exemples rapides
-
-```bash
-# Frais virement au guichet (extractif)
-EMBED_BACKEND=hf LLM_BACKEND=none python3 scripts/query.py "Frais d'un virement SEPA au guichet ?"
-
-# Virement instantané (LLM Hugging Face)
-EMBED_BACKEND=hf LLM_BACKEND=hf HF_REPO_ID=Qwen/Qwen2.5-7B-Instruct python3 scripts/query.py "Le virement instantané est-il disponible 24/7 ?"
-```
-
-> Les réponses s’accompagnent toujours des **références** (titre + URL) pour vérification immédiate.
+- Code : **MIT**  
+- Corpus : **La Banque Postale**, **Service-Public**, **Banque de France**  
+- Logo **LBP** : utilisé uniquement pour la démonstration (marque déposée)
